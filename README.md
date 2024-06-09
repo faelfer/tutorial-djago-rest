@@ -50,30 +50,10 @@ black .
 
 ## Testing with Jest
 
-Use the [Jest](https://jestjs.io/) to run unit tests and generate coverage report.
+Use the [API Test Case](https://www.django-rest-framework.org/api-guide/testing/) to unit tests.
 
 ```bash
-yarn test-unit
-```
-
-```bash
-yarn test-unit-coverage
-```
-
-## Testing with Playwright
-
-Use the [Playwright](https://playwright.dev/) to run, debug and generate code from end-to-end tests.
-
-```bash
-yarn test-e2e
-```
-
-```bash
-yarn test-e2e-debug
-```
-
-```bash
-yarn test-e2e-codegen
+python manage.py test
 ```
 
 ## Run GitHub Actions locally with act

@@ -1,0 +1,86 @@
+---
+name: Check and Test Django Application
+"on":
+  push:
+    branches:
+      - master
+      - develop
+jobs:
+  black:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up python environment
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+      - name: Checkout code
+        uses: actions/checkout@master
+      - name: Install flake8
+        run: pip install black
+      - name: Run black check
+        run: black *.py --check
+  flake8:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up python environment
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+      - name: Checkout code
+        uses: actions/checkout@master
+      - name: Install flake8
+        run: pip install flake8
+      - name: Run flake8 check
+        run: flake8 .
+  testing:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+    # Add in environment variables for the entire "build" job
+    env:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: tutorial
+      POSTGRES_HOST: localhost # default host value for the database
+      POSTGRES_PORT: 5432
+    services:
+      postgres_main:
+        image: postgres:15
+        env:
+          POSTGRES_USER: ${{ env.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
+          POSTGRES_DB: ${{ env.POSTGRES_DB }}
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready 
+          --health-interval 10s 
+          --health-timeout 5s 
+          --health-retries 5
+    # If you want to test multiple python version(s)
+    strategy:
+      matrix:
+        python-version: ["3.8"] # ["3.8", "3.9", "3.10"]
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - name: Set up python environment
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+      - name: Checkout code
+        uses: actions/checkout@master
+      - name: Install requirements
+        run: |
+          pip install -r requirements.txt
+      - name: Create env file
+        run: |
+          touch .env
+          echo DATABASE_NAME=${{ env.POSTGRES_DB }} >> .env
+          echo DATABASE_USER=${{ env.POSTGRES_USER }} >> .env
+          echo DATABASE_PASSWORD=${{ env.POSTGRES_PASSWORD }} >> .env
+          echo DATABASE_HOST=${{ env.POSTGRES_HOST }} >> .env
+          echo DATABASE_PORT=${{ env.POSTGRES_PORT }} >> .env
+          cat .env
+      - name: Run Tests
+        run: |
+          python manage.py test

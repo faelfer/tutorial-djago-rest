@@ -140,9 +140,7 @@ class DeleteSnippetTest(APITestCase):
 
     def test_delete_snippet(self):
         url = "/snippets/" + str(self.snippet_seven.pk) + "/"
-        response = self.client.delete(
-            url, format="json"
-        )
+        response = self.client.delete(url, format="json")
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
 
@@ -226,9 +224,7 @@ class GetSingleUserTest(APITestCase):
         serializer_context = {
             "request": Request(request),
         }
-        serializer = UserSerializer(
-            instance=user, context=serializer_context
-        )
+        serializer = UserSerializer(instance=user, context=serializer_context)
         logger.info("sigle user:" + str(response.data))
         self.assertEqual(response.data, serializer.data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
